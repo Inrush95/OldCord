@@ -9,6 +9,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: uowuo/abaddon
+          ref: 'v0.2.2'
           submodules: recursive
 
       - name: Setup MSYS2
@@ -16,6 +17,7 @@ jobs:
         with:
           msystem: MINGW32
           update: true
+          suppress-deprecation-warnings: true
           install: >-
             git
             mingw-w64-i686-toolchain
@@ -31,7 +33,10 @@ jobs:
         shell: msys2 {0}
         run: |
           mkdir build && cd build
-          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=MinSizeRel
+          cmake .. -G "Ninja" \
+            -DCMAKE_BUILD_TYPE=MinSizeRel \
+            -DBUILD_TESTING=OFF \
+            -DENABLE_DOCS=OFF
           ninja
 
       - name: Upload Finished Program
