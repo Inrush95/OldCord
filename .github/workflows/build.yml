@@ -14,16 +14,16 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW32
-          update: false # Stop it from touching modern empty repositories
+          update: false
 
       - name: Redirect to Historical 32-bit Archives
         shell: msys2 {0}
         run: |
-          # Overwrite mirror links to point directly to working snapshot archives
-          echo "Server = https://repo.msys2.org/mingw/mingw32/" > /etc/pacman.d/mirrorlist.mingw32
-          echo "Server = https://msys2.org\$arch/" > /etc/pacman.d/mirrorlist.msys
+          # Use raw text names to fix the variable expansion error completely
+          echo "Server = https://msys2.org" > /etc/pacman.d/mirrorlist.mingw32
+          echo "Server = https://msys2.org" > /etc/pacman.d/mirrorlist.msys
           
-          # Initialize validation parameters
+          # Initialize database catalogs cleanly
           pacman-key --init
           pacman-key --populate msys2
           pacman -Sy --noconfirm
@@ -31,10 +31,10 @@ jobs:
       - name: Install Compiler and Pre-compiled Libraries
         shell: msys2 {0}
         run: |
-          # Install core binary compiling components
+          # Download bare-bones compilation components
           pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-cmake mingw-w64-i686-pkgconf
           
-          # Install the exact libraries needed by Abaddon from the archive
+          # Download specific 32-bit dependency frameworks
           pacman -S --needed --noconfirm mingw-w64-i686-nlohmann-json mingw-w64-i686-gtkmm3 mingw-w64-i686-libsodium mingw-w64-i686-opus mingw-w64-i686-spdlog
 
       - name: Build Application
