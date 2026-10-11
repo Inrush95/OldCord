@@ -10,43 +10,32 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Core MSYS2 Environment
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW32
-          update: false
+      - name: Setup Windows MSVC Build Environment
+        uses: microsoft/setup-msbuild@v2
 
-      - name: Redirect to Historical 32-bit Archives
-        shell: msys2 {0}
+      - name: Configure Developer Toolchain
+        uses: cmake-actions/setup-cmake@v1
+
+      - name: Setup Header-Only Dependencies
+        shell: cmd
         run: |
-          # Use raw text names to fix the variable expansion error completely
-          echo "Server = https://msys2.org" > /etc/pacman.d/mirrorlist.mingw32
-          echo "Server = https://msys2.org" > /etc/pacman.d/mirrorlist.msys
+          # Pull down the critical missing JSON framework directly from source
+          git clone https://github.com subprojects/json
           
-          # Initialize database catalogs cleanly
-          pacman-key --init
-          pacman-key --populate msys2
-          pacman -Sy --noconfirm
+          # Clone the required tracking libraries directly to prevent 404 dependencies
+          git clone https://github.com subprojects/libhandy
 
-      - name: Install Compiler and Pre-compiled Libraries
-        shell: msys2 {0}
+      - name: Compile 32-bit Desktop Binary
+        shell: cmd
         run: |
-          # Download bare-bones compilation components
-          pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-cmake mingw-w64-i686-pkgconf
-          
-          # Download specific 32-bit dependency frameworks
-          pacman -S --needed --noconfirm mingw-w64-i686-nlohmann-json mingw-w64-i686-gtkmm3 mingw-w64-i686-libsodium mingw-w64-i686-opus mingw-w64-i686-spdlog
-
-      - name: Build Application
-        shell: msys2 {0}
-        run: |
-          mkdir build && cd build
-          cmake -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release ..
-          make -j2
+          mkdir build
+          cd build
+          cmake -A Win32 -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --config Release
 
       - name: Upload Completed 32-bit Executable
         uses: actions/upload-artifact@v4
         with:
           name: abaddon-windows-32bit
-          path: build/abaddon.exe
+          path: build/Release/abaddon.exe
           
