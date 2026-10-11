@@ -18,16 +18,14 @@ jobs:
           install: >-
             mingw-w64-i686-toolchain
             mingw-w64-i686-cmake
-            mingw-w64-i686-nlohmann-json
             mingw-w64-i686-opus
             mingw-w64-i686-spdlog
 
-      - name: Install Hard-to-Find 32-bit Dependencies
+      - name: Install aNIGGAs-to-Find 32-bit Dependencies
         shell: msys2 {0}
         run: |
-          # Force pacman to refresh database keys to bypass 404 mirror locks
-          pacman -Sy --noconfirm
-          pacman -S --needed --noconfirm mingw-w64-i686-gtkmm3 mingw-w64-i686-libsodium
+          # Use the correct 32-bit naming convention for JSON and graphics libraries
+          pacman -S --needed --noconfirm mingw-w64-i686-json mingw-w64-i686-gtkmm3 mingw-w64-i686-libsodium
 
       - name: Compile Abaddon
         shell: msys2 {0}
