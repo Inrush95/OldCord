@@ -10,25 +10,32 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Fast MSYS2 Environment
+      - name: Setup Core MSYS2 Environment
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW32
-          update: false
+          update: false # Stop it from touching modern empty repositories
 
-      - name: Install Slim Build Tools Only
+      - name: Redirect to Historical 32-bit Archives
         shell: msys2 {0}
         run: |
-          # Initialize database indexes
+          # Overwrite mirror links to point directly to working snapshot archives
+          echo "Server = https://repo.msys2.org/mingw/mingw32/" > /etc/pacman.d/mirrorlist.mingw32
+          echo "Server = https://msys2.org\$arch/" > /etc/pacman.d/mirrorlist.msys
+          
+          # Initialize validation parameters
           pacman-key --init
           pacman-key --populate msys2
           pacman -Sy --noconfirm
-          
-          # Install only the absolute bare essential compiler binaries to avoid timeouts
+
+      - name: Install Compiler and Pre-compiled Libraries
+        shell: msys2 {0}
+        run: |
+          # Install core binary compiling components
           pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-cmake mingw-w64-i686-pkgconf
           
-          # Install core library binaries
-          pacman -S --needed --noconfirm mingw-w64-i686-json mingw-w64-i686-gtkmm3 mingw-w64-i686-libsodium mingw-w64-i686-opus mingw-w64-i686-spdlog
+          # Install the exact libraries needed by Abaddon from the archive
+          pacman -S --needed --noconfirm mingw-w64-i686-nlohmann-json mingw-w64-i686-gtkmm3 mingw-w64-i686-libsodium mingw-w64-i686-opus mingw-w64-i686-spdlog
 
       - name: Build Application
         shell: msys2 {0}
