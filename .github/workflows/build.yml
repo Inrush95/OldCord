@@ -5,19 +5,14 @@ jobs:
   build-x86:
     runs-on: windows-latest
     steps:
-      - name: Checkout Source Code
+      - name: Checkout Source Code and All Dependencies
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          set-safe-directory: true
 
       - name: Setup Windows MSVC Build Environment
         uses: microsoft/setup-msbuild@v2
-
-      - name: Setup Direct Source Dependencies
-        shell: cmd
-        run: |
-          git clone --depth 1 https://github.com subprojects/json
-          git clone --depth 1 https://github.com subprojects/libhandy
 
       - name: Compile 32-bit Desktop Binary
         shell: cmd
