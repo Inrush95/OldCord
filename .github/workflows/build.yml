@@ -3,44 +3,40 @@ on: [workflow_dispatch]
 
 jobs:
   build-x86:
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout Source Code
         uses: actions/checkout@v4
         with:
-          repository: uowuo/abaddon
-          ref: 'v0.2.2'
-          submodules: 'recursive'
+          submodules: recursive
 
-      - name: Setup MSYS2 Environment
-        uses: msys2/setup-msys2@v2.22.0
+      - name: Setup MSYS2 and Update Mirrors
+        uses: msys2/setup-msys2@v2
         with:
-          msystem: CLANG32
-          update: false
-          path-type: minimal
+          msystem: MINGW32
+          update: true
+          install: >-
+            mingw-w64-i686-toolchain
+            mingw-w64-i686-cmake
+            mingw-w64-i686-nlohmann-json
+            mingw-w64-i686-opus
+            mingw-w64-i686-spdlog
 
-      - name: Install 32-bit Core Dependencies
+      - name: Install Hard-to-Find 32-bit Dependencies
         shell: msys2 {0}
         run: |
-          pacman -Sy --noconfirm --needed \
-            git \
-            mingw-w64-clang-i386-toolchain \
-            mingw-w64-clang-i386-cmake \
-            mingw-w64-clang-i386-ninja \
-            mingw-w64-clang-i386-gtkmm3 \
-            mingw-w64-clang-i386-libhandy \
-            mingw-w64-clang-i386-libsodium \
-            mingw-w64-clang-i386-nlohmann-json \
-            mingw-w64-clang-i386-spdlog
+          # Force pacman to refresh database keys to bypass 404 mirror locks
+          pacman -Sy --noconfirm
+          pacman -S --needed --noconfirm mingw-w64-i686-gtkmm3 mingw-w64-i686-libsodium
 
-      - name: Compile Application
+      - name: Compile Abaddon
         shell: msys2 {0}
         run: |
           mkdir build && cd build
-          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=MinSizeRel -DBUILD_TESTING=OFF -DENABLE_DOCS=OFF
-          ninja
+          cmake -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+          make -j2
 
-      - name: Upload Finished Program
+      - name: Upload Completed 32-bit Executable
         uses: actions/upload-artifact@v4
         with:
           name: abaddon-windows-32bit
