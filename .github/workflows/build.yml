@@ -15,23 +15,23 @@ jobs:
       - name: Setup MSYS2 Environment
         uses: msys2/setup-msys2@v2.22.0
         with:
-          msystem: MINGW32
-          update: false
+          msystem: CLANG32
+          update: true
           path-type: minimal
 
-      - name: Sync and Install 32-bit Dependencies
+      - name: Install 32-bit Core Dependencies
         shell: msys2 {0}
         run: |
-          pacman -Sy --noconfirm --needed \
+          pacman -S --noconfirm --needed \
             git \
-            mingw-w64-i686-toolchain \
-            mingw-w64-i686-cmake \
-            mingw-w64-i686-ninja \
-            mingw-w64-i686-gtkmm3 \
-            mingw-w64-i686-libhandy \
-            mingw-w64-i686-libsodium \
-            mingw-w64-i686-nlohmann-json \
-            mingw-w64-i686-spdlog
+            mingw-w64-clang-i686-toolchain \
+            mingw-w64-clang-i686-cmake \
+            mingw-w64-clang-i686-ninja \
+            mingw-w64-clang-i686-gtkmm3 \
+            mingw-w64-clang-i686-libhandy \
+            mingw-w64-clang-i686-libsodium \
+            mingw-w64-clang-i686-nlohmann-json \
+            mingw-w64-clang-i686-spdlog
 
       - name: Compile Application
         shell: msys2 {0}
