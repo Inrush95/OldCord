@@ -13,11 +13,11 @@ jobs:
           submodules: 'recursive'
 
       - name: Setup MSYS2 Environment
-        uses: msys2/setup-msys2@v2
+        uses: msys2/setup-msys2@v2.22.0  # Uses a rock-solid, verified release tag
         with:
           msystem: MINGW32
           update: false
-          suppress-deprecation-warnings: 'msystem-mingw32'
+          path-type: minimal
 
       - name: Install 32-bit Core Dependencies
         shell: msys2 {0}
@@ -45,3 +45,4 @@ jobs:
         with:
           name: abaddon-windows-32bit
           path: build/abaddon.exe
+          
