@@ -14,12 +14,21 @@ jobs:
       - name: Setup Windows MSVC Build Environment
         uses: microsoft/setup-msbuild@v2
 
-      - name: Compile 32-bit Desktop Binary
+      - name: Locate Source and Compile 32-bit Binary
         shell: cmd
         run: |
+          # 1. Look for the folder that actually contains CMakeLists.txt
+          dir /s /b CMakeLists.txt > folder_path.txt
+          set /p SOURCE_PATH=<folder_path.txt
+          
+          # 2. Extract the directory name from the full file path
+          for %%F in ("%SOURCE_PATH%") do set "SOURCE_DIR=%%~dpF"
+          echo Target source directory is: %SOURCE_DIR%
+          
+          # 3. Create the build directory and point CMake right at the valid folder
           mkdir build
           cd build
-          cmake -A Win32 -DCMAKE_BUILD_TYPE=Release ..
+          cmake -A Win32 -DCMAKE_BUILD_TYPE=Release "%SOURCE_DIR%"
           cmake --build . --config Release
 
       - name: Upload Completed 32-bit Executable
