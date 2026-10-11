@@ -13,14 +13,11 @@ jobs:
       - name: Setup Windows MSVC Build Environment
         uses: microsoft/setup-msbuild@v2
 
-      - name: Setup Header-Only Dependencies
+      - name: Setup Direct Source Dependencies
         shell: cmd
         run: |
-          # Pull down the critical missing JSON framework directly from source
-          git clone https://github.com subprojects/json
-          
-          # Clone the required tracking libraries directly to prevent 404 dependencies
-          git clone https://github.com subprojects/libhandy
+          git clone --depth 1 https://github.com subprojects/json
+          git clone --depth 1 https://github.com subprojects/libhandy
 
       - name: Compile 32-bit Desktop Binary
         shell: cmd
