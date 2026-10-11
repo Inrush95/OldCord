@@ -10,24 +10,24 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Core MSYS2 Environment
+      - name: Setup Fast MSYS2 Environment
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW32
-          update: false # Stop the runner from getting stuck on automated mirror upgrades
+          update: false
 
-      - name: Force Fix Keys and Install Toolchain
+      - name: Install Slim Build Tools Only
         shell: msys2 {0}
         run: |
-          # Kill the broken key validation step and populate fresh databases manually
+          # Initialize database indexes
           pacman-key --init
           pacman-key --populate msys2
           pacman -Sy --noconfirm
           
-          # Install compile utilities directly 
-          pacman -S --needed --noconfirm mingw-w64-i686-toolchain mingw-w64-i686-cmake
+          # Install only the absolute bare essential compiler binaries to avoid timeouts
+          pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-i686-make mingw-w64-i686-cmake mingw-w64-i686-pkgconf
           
-          # Install working 32-bit dependency equivalents
+          # Install core library binaries
           pacman -S --needed --noconfirm mingw-w64-i686-json mingw-w64-i686-gtkmm3 mingw-w64-i686-libsodium mingw-w64-i686-opus mingw-w64-i686-spdlog
 
       - name: Build Application
