@@ -1,0 +1,41 @@
+name: Compile 32-bit Abaddon
+on: [workflow_dispatch]
+
+jobs:
+  build-x86:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          repository: uowuo/abaddon
+          submodules: recursive
+
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW32
+          update: true
+          install: >-
+            git
+            mingw-w64-i686-toolchain
+            mingw-w64-i686-cmake
+            mingw-w64-i686-ninja
+            mingw-w64-i686-gtkmm3
+            mingw-w64-i686-libhandy
+            mingw-w64-i686-libsodium
+            mingw-w64-i686-nlohmann-json
+            mingw-w64-i686-spdlog
+
+      - name: Compile Application
+        shell: msys2 {0}
+        run: |
+          mkdir build && cd build
+          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=MinSizeRel
+          ninja
+
+      - name: Upload Finished Program
+        uses: actions/upload-artifact@v4
+        with:
+          name: abaddon-windows-32bit
+          path: build/abaddon.exe
