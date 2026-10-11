@@ -24,14 +24,14 @@ jobs:
         run: |
           pacman -Sy --noconfirm --needed \
             git \
-            mingw-w64-i686-clang \
-            mingw-w64-i686-cmake \
-            mingw-w64-i686-ninja \
-            mingw-w64-i686-gtkmm3 \
-            mingw-w64-i686-libhandy \
-            mingw-w64-i686-libsodium \
-            mingw-w64-i686-nlohmann-json \
-            mingw-w64-i686-spdlog
+            mingw-w64-clang-i386-toolchain \
+            mingw-w64-clang-i386-cmake \
+            mingw-w64-clang-i386-ninja \
+            mingw-w64-clang-i386-gtkmm3 \
+            mingw-w64-clang-i386-libhandy \
+            mingw-w64-clang-i386-libsodium \
+            mingw-w64-clang-i386-nlohmann-json \
+            mingw-w64-clang-i386-spdlog
 
       - name: Compile Application
         shell: msys2 {0}
