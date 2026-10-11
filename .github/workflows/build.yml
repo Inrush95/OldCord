@@ -10,14 +10,14 @@ jobs:
         with:
           repository: uowuo/abaddon
           ref: 'v0.2.2'
-          submodules: recursive
+          submodules: 'recursive'
 
       - name: Setup MSYS2
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW32
           update: true
-          suppress-deprecation-warnings: true
+          suppress-deprecation-warnings: 'msystem-mingw32'
           install: >-
             git
             mingw-w64-i686-toolchain
@@ -33,10 +33,7 @@ jobs:
         shell: msys2 {0}
         run: |
           mkdir build && cd build
-          cmake .. -G "Ninja" \
-            -DCMAKE_BUILD_TYPE=MinSizeRel \
-            -DBUILD_TESTING=OFF \
-            -DENABLE_DOCS=OFF
+          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=MinSizeRel -DBUILD_TESTING=OFF -DENABLE_DOCS=OFF
           ninja
 
       - name: Upload Finished Program
