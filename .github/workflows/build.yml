@@ -10,24 +10,27 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup MSYS2 and Update Mirrors
+      - name: Setup Core MSYS2 Environment
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW32
-          update: true
-          install: >-
-            mingw-w64-i686-toolchain
-            mingw-w64-i686-cmake
-            mingw-w64-i686-opus
-            mingw-w64-i686-spdlog
+          update: false # Stop the runner from getting stuck on automated mirror upgrades
 
-      - name: Install aNIGGAs-to-Find 32-bit Dependencies
+      - name: Force Fix Keys and Install Toolchain
         shell: msys2 {0}
         run: |
-          # Use the correct 32-bit naming convention for JSON and graphics libraries
-          pacman -S --needed --noconfirm mingw-w64-i686-json mingw-w64-i686-gtkmm3 mingw-w64-i686-libsodium
+          # Kill the broken key validation step and populate fresh databases manually
+          pacman-key --init
+          pacman-key --populate msys2
+          pacman -Sy --noconfirm
+          
+          # Install compile utilities directly 
+          pacman -S --needed --noconfirm mingw-w64-i686-toolchain mingw-w64-i686-cmake
+          
+          # Install working 32-bit dependency equivalents
+          pacman -S --needed --noconfirm mingw-w64-i686-json mingw-w64-i686-gtkmm3 mingw-w64-i686-libsodium mingw-w64-i686-opus mingw-w64-i686-spdlog
 
-      - name: Compile Abaddon
+      - name: Build Application
         shell: msys2 {0}
         run: |
           mkdir build && cd build
