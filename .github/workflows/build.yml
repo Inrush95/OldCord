@@ -13,9 +13,6 @@ jobs:
       - name: Setup Windows MSVC Build Environment
         uses: microsoft/setup-msbuild@v2
 
-      - name: Configure Developer Toolchain
-        uses: cmake-actions/setup-cmake@v1
-
       - name: Setup Header-Only Dependencies
         shell: cmd
         run: |
